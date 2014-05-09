@@ -3,7 +3,7 @@
 @main("Welcome to Play") {
 
 
-  @helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data", 'method -> "POST") {
+  @helper.form(action = routes.Application.upload3, 'enctype -> "multipart/form-data", 'method -> "POST") {
     <input type="file" name="file" />
     <p><input type="submit" /></p>
   }
