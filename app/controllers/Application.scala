@@ -31,7 +31,6 @@ object Application extends Controller {
       StateHelper.requestIdEnumeratorsMap += ((id, enumerator))
       iteratee
     }
-    case _ => throw new RuntimeException("dupa")
   })
 
   /**
@@ -44,7 +43,15 @@ object Application extends Controller {
 
   def containerMultipartBodyParser = BodyParser("containerMultipart")(requestHeader => {
     print(s"the request id is ${requestHeader.id}\n")
-    multipartParser(requestHeader.id).apply(requestHeader).map(x => Right(Unit))
+    val ret = multipartParser(requestHeader.id).apply(requestHeader).map(x => Right(Unit))
+    Promise.timeout[String]("testing RuntimeExceptions", 5000) onComplete { str =>
+      throw new RuntimeException(str.get)
+    }
+    ret.map[Right[Nothing, Unit.type]](x => {
+      println("upload parser iteratee is SO done")
+      x
+    })
+
   })
   /*
   val enumeratorSaverBodyParser: BodyParser[Unit] = BodyParser("enumeratorBodyParser")( requestHeader => {
@@ -69,6 +76,7 @@ object Application extends Controller {
 
   def upload3 = Action(containerMultipartBodyParser) (rq => {
     val reqId = rq.id
+    println("upload action!")
     Ok(views.html.index(s"finished uploading file with request id = ${reqId}"))
   })
 
@@ -77,8 +85,9 @@ object Application extends Controller {
     StateHelper.requestIdEnumeratorsMap.get(id) match {
       case None => NotFound("404 - not found")
       case Some(enumerator)  => {
+        val reportingEnumerator = enumerator.onDoneEnumerating({println("done enumerating the download")})
         StateHelper.requestIdEnumeratorsMap -= id
-        Ok.chunked(enumerator).as("application/octet-stream")
+        Ok.chunked(reportingEnumerator).as("application/octet-stream")
       }
     }
   })
