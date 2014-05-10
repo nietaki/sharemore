@@ -12,24 +12,22 @@ object IterateeHelpers {
 
   def cancellableIteratee[E, T](innerIteratee: Iteratee[E, Either[SimpleResult, T]], doCancel: Future[Unit]): Iteratee[E, Either[SimpleResult, T]] = {
 
-    def step(inner: Iteratee[E, Either[SimpleResult, T]], input: Input[E]): Iteratee[E, Either[SimpleResult, T]] = inner match {
+    def augmented(inner: Iteratee[E, Either[SimpleResult, T]]): Iteratee[E, Either[SimpleResult, T]] = inner match {
       case d: Step.Done[E, Either[SimpleResult, T]] => d
       case e: Step.Error[E] => e
-      case cont: Step.Cont[E, Either[SimpleResult, T]] =>  doCancel.value match {
-        case None => cont.k(input)
-        case Some(_) => {//this could be an exception
-          Error("iterating cancelled", input)
+      case cont: Step.Cont[E, Either[SimpleResult, T]] => {
+        val k = cont.k
+        def augmentedStep(i: Input[E]): Iteratee[E, Either[SimpleResult, T]] = {
+          doCancel.value match {
+            case Some(_) => Error[E]("cancelled", i)
+            case _ => augmented(cont.k(i))
+          }
         }
+        Cont(augmentedStep)
       }
     }
 
-    //starting mapper
-    innerIteratee match {
-      case d: Step.Done[E, Either[SimpleResult, T]] => d
-      case e: Step.Error[E] => e
-      case cont: Step.Cont[E, Either[SimpleResult, T]] =>
-    }
-
+    augmented(innerIteratee)
   }
 
 }
