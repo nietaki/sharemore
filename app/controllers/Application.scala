@@ -1,6 +1,6 @@
 package controllers
 
-import helpers.StateHelper
+import helpers.{IterateeHelpers, StateHelper}
 import play.api._
 import play.api.mvc._
 import play.api.libs.iteratee._
@@ -38,20 +38,16 @@ object Application extends Controller {
    */
   val ignorer: PartialFunction[Any, Iteratee[Array[Byte], Unit]] = { case _ => Iteratee.ignore }
 
-
   def multipartParser(id: Long) = Multipart.multipartParser(filePartHandler(id).orElse(ignorer))
 
   def containerMultipartBodyParser = BodyParser("containerMultipart")(requestHeader => {
     print(s"the request id is ${requestHeader.id}\n")
     val ret = multipartParser(requestHeader.id).apply(requestHeader).map(x => Right(Unit))
-    Promise.timeout[String]("testing RuntimeExceptions", 5000) onComplete { str =>
-      throw new RuntimeException(str.get)
-    }
-    ret.map[Right[Nothing, Unit.type]](x => {
+    val retDone = ret.map[Right[Nothing, Unit.type]](x => {
       println("upload parser iteratee is SO done")
       x
     })
-
+    retDone
   })
   /*
   val enumeratorSaverBodyParser: BodyParser[Unit] = BodyParser("enumeratorBodyParser")( requestHeader => {

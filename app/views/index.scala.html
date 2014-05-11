@@ -1,11 +1,28 @@
 @(message: String)
 
-@main("Welcome to Play") {
+@main("Sharemore") {
 
+  <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
+  <script>
+    $(document).ready(function () {
+      $('.fileUpload').liteUploader({
+        script: '/upload'
+      })
+      .on('lu:success', function (e, response) {
+        alert('Uploaded!');
+      } )
+      .on('lu:progress', function(e, procent){
+        console.log("progress " + procent.toString())
+      });
+    });
+    //$('.fileUpload').data().liteUploader.abort()
+  </script>
 
+  <!--
   @helper.form(action = routes.Application.upload3, 'enctype -> "multipart/form-data", 'method -> "POST") {
     <input type="file" name="file" />
     <p><input type="submit" /></p>
   }
-  <!--@play20.welcome(message)-->
+  -->
+
 }
