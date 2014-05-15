@@ -21,8 +21,7 @@ function LiteUploader (element, options) {
     this.el = $(element);
     this.options = options;
     this.params = options.params;
-
-    this.xhr = null
+    this.xhr = this._buildXhrObject();
 
     this._init();
 }
@@ -39,6 +38,18 @@ LiteUploader.prototype = {
             this.options.clickElement.click(function () {
                 this._start();
             }.bind(this));
+        }
+    },
+
+    _buildXhrObject: function () {
+        var xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener('progress', this._onProgress.bind(this), false);
+        return xhr;
+    },
+
+    _onProgress: function (evt) {
+        if (evt.lengthComputable) {
+            this.el.trigger('lu:progress', Math.floor((evt.loaded / evt.total) * 100));
         }
     },
 
@@ -151,15 +162,7 @@ LiteUploader.prototype = {
     _performUpload: function (formData) {
         $.ajax({
             xhr: function () {
-                var xhr = new XMLHttpRequest();
-
-                xhr.upload.addEventListener('progress', function (evt) {
-                    if (evt.lengthComputable) {
-                        this.el.trigger('lu:progress', Math.floor((evt.loaded / evt.total) * 100));
-                    }
-                }.bind(this), false);
-                this.xhr = xhr
-                return xhr;
+                return this.xhr;
             }.bind(this),
             url: this.options.script,
             type: 'POST',
@@ -169,10 +172,11 @@ LiteUploader.prototype = {
         })
         .done(function(response){
             this.el.trigger('lu:success', response);
-            this._resetInput();
         }.bind(this))
         .fail(function(jqXHR) {
             this.el.trigger('lu:fail', jqXHR);
+        }.bind(this))
+        .always(function() {
             this._resetInput();
         }.bind(this));
     },
@@ -181,10 +185,9 @@ LiteUploader.prototype = {
         this.params[key] = value;
     },
 
-    abort: function() {
-      if(this.xhr) {
-        this.xhr.abort()
-        this.xhr = null
-      }
+    cancelUpload: function () {
+        this.xhr.abort();
+        this.el.trigger('lu:cancelled');
+        this._resetInput();
     }
 };

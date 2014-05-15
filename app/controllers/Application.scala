@@ -1,6 +1,6 @@
 package controllers
 
-import helpers.{IterateeHelpers, StateHelper}
+import helpers._
 import play.api._
 import play.api.mvc._
 import play.api.libs.iteratee._
@@ -12,7 +12,8 @@ import play.api.mvc.BodyParsers.parse.Multipart
 object Application extends Controller {
 
   def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+    val ident = BusinessHelper.newIdent()
+    Ok(views.html.index(ident))
   }
 
   val fastBodyAccumulator = BodyParser(
