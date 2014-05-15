@@ -2,10 +2,11 @@ package controllers
 
 import helpers._
 import play.api._
+import play.api.Play.current //damn implicit app
 import play.api.mvc._
 import play.api.libs.iteratee._
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.libs.concurrent.Promise
+import play.api.libs.concurrent.{Akka, Promise}
 import scala.concurrent.Future
 import play.api.mvc.BodyParsers.parse.Multipart
 
@@ -13,6 +14,10 @@ object Application extends Controller {
 
   def index = Action {
     val ident = BusinessHelper.newIdent()
+
+    //val ref = Akka.system.actorSelection(BusinessHelper.transferSupervisorPath)
+    //ref ! "test"
+
     Ok(views.html.index(ident))
   }
 
@@ -49,6 +54,8 @@ object Application extends Controller {
     val ret = multipartParser(ident).apply(requestHeader).map(x => Right(Unit))
     val retDone = ret.map[Right[Nothing, Unit.type]](x => {
       println("upload parser iteratee is SO done")
+      val ref = Akka.system.actorSelection(BusinessHelper.transferSupervisorPath)
+      ref ! BusinessHelper.DownloadDone(ident)
       x
     })
     retDone
@@ -61,8 +68,11 @@ object Application extends Controller {
 
   def download(ident: String) = Action {rq =>
     //val filename="tmp.tmp"
-    val filename = BusinessHelper.escape(StateHelper.identFilenameMap(ident))
-    Ok(views.html.download(ident, filename))
+    val filenameOption = StateHelper.identFilenameMap.get(ident).map(BusinessHelper.escape(_))
+    filenameOption match {
+      case None => NotFound("404: upload for this id hasn't been started")
+      case Some(filename) => Ok(views.html.download(ident, filename))
+    }
   }
 
   def file(ident: String, filename: String) = Action(rq => {

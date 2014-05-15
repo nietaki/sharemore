@@ -1,6 +1,7 @@
 package helpers
 
 import scala.util.Random
+import akka.actor.ActorRef
 
 /**
  * Created by nietaki on 5/15/14.
@@ -15,4 +16,19 @@ object BusinessHelper {
   def escape(filename: String): String = {
     filename.replaceAll("\\s", "_")
   }
+
+  val transferSupervisorName = "transferSupervisor"
+
+  lazy val transferSupervisorPath = "akka://application/user/" + transferSupervisorName
+
+  /*
+   * messages sent to the supervisor
+   */
+  case class DownloadDone(ident: String)
+
+  /*
+   * messages sent by the transfer trackers to the supervisor
+   */
+  case class Subscribe(actorRef: ActorRef, ident: String)
+  case class Unsubscribe(actorRef: ActorRef, ident: String)
 }
