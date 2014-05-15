@@ -17,9 +17,10 @@ object BusinessHelper {
     filename.replaceAll("\\s", "_")
   }
 
-  val transferSupervisorName = "transferSupervisor"
+  //val transferSupervisorName = "transferSupervisor"
+  //lazy val transferSupervisorPath = "akka://application/user/" + transferSupervisorName
 
-  lazy val transferSupervisorPath = "akka://application/user/" + transferSupervisorName
+  var transferSupervisorRef: ActorRef = null
 
   /*
    * messages sent to the supervisor

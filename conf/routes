@@ -11,6 +11,8 @@ GET         /download/:ident       controllers.Application.download(ident: Strin
 
 GET         /file/:ident/:filename      controllers.Application.file(ident: String, filename: String)
 
+GET         /status/:ident       controllers.Application.status(ident: String)
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 GET     /webjars/*file              controllers.WebJarAssets.at(file)

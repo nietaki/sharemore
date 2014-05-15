@@ -2,7 +2,10 @@ package controllers
 
 import helpers._
 import play.api._
-import play.api.Play.current //damn implicit app
+import play.api.Play.current
+import play.api.libs.json.JsValue
+
+//damn implicit app
 import play.api.mvc._
 import play.api.libs.iteratee._
 import play.api.libs.concurrent.Execution.Implicits._
@@ -17,7 +20,7 @@ object Application extends Controller {
 
     //val ref = Akka.system.actorSelection(BusinessHelper.transferSupervisorPath)
     //ref ! "test"
-
+    BusinessHelper.transferSupervisorRef ! "test"
     Ok(views.html.index(ident))
   }
 
@@ -54,8 +57,8 @@ object Application extends Controller {
     val ret = multipartParser(ident).apply(requestHeader).map(x => Right(Unit))
     val retDone = ret.map[Right[Nothing, Unit.type]](x => {
       println("upload parser iteratee is SO done")
-      val ref = Akka.system.actorSelection(BusinessHelper.transferSupervisorPath)
-      ref ! BusinessHelper.DownloadDone(ident)
+      //val ref = Akka.system.actorSelection(BusinessHelper.transferSupervisorPath)
+      BusinessHelper.transferSupervisorRef ! BusinessHelper.DownloadDone(ident)
       x
     })
     retDone
@@ -91,4 +94,10 @@ object Application extends Controller {
       }
     }
   })
+
+  //def status(ident: String) = Action(rq => NotFound("tmp"))
+
+  def status(ident: String) = WebSocket.acceptWithActor[JsValue, JsValue](rh =>
+    out =>
+    TransferTracker.props(ident, BusinessHelper.transferSupervisorRef, out))
 }
