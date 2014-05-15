@@ -1,7 +1,11 @@
-import play.Project._
+name := """sharemore_2_3"""
 
-name := "sharemore"
+version := "1.0-SNAPSHOT"
 
-version := "1.0"
+libraryDependencies ++= Seq(
+  "org.webjars" %% "webjars-play" % "2.3-M1",
+  "org.webjars" % "bootstrap" % "2.3.1",
+  "org.webjars" % "requirejs" % "2.1.11-1"
+)
 
-playScalaSettings
+lazy val root = (project in file(".")).addPlugins(PlayScala)
