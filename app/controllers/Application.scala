@@ -26,10 +26,10 @@ object Application extends Controller {
       ).map(Right(_))
   )
 
-  def filePartHandler(id: Long) = Multipart.handleFilePart({
+  def filePartHandler(ident: String) = Multipart.handleFilePart({
     case Multipart.FileInfo(partName, filename, contentType) => {
       val (iteratee, enumerator) = Concurrent.joined[Array[Byte]]
-      StateHelper.requestIdEnumeratorsMap += ((id, enumerator))
+      StateHelper.identEnumeratorsMap += ((ident, enumerator))
       iteratee
     }
   })
@@ -39,17 +39,17 @@ object Application extends Controller {
    */
   val ignorer: PartialFunction[Any, Iteratee[Array[Byte], Unit]] = { case _ => Iteratee.ignore }
 
-  def multipartParser(id: Long) = Multipart.multipartParser(filePartHandler(id).orElse(ignorer))
+  def multipartParser(ident: String) = Multipart.multipartParser(filePartHandler(ident).orElse(ignorer))
 
-  def containerMultipartBodyParser = BodyParser("containerMultipart")(requestHeader => {
-    print(s"the request id is ${requestHeader.id}\n")
-    val ret = multipartParser(requestHeader.id).apply(requestHeader).map(x => Right(Unit))
+  def containerMultipartBodyParser(ident: String) = BodyParser("containerMultipart")(requestHeader => {
+    val ret = multipartParser(ident).apply(requestHeader).map(x => Right(Unit))
     val retDone = ret.map[Right[Nothing, Unit.type]](x => {
       println("upload parser iteratee is SO done")
       x
     })
     retDone
   })
+
   /*
   val enumeratorSaverBodyParser: BodyParser[Unit] = BodyParser("enumeratorBodyParser")( requestHeader => {
     val (iteratee, enumerator) = Concurrent.joined[Array[Byte]]
@@ -57,7 +57,7 @@ object Application extends Controller {
     StateHelper.requestIdEnumeratorsMap += ((requestHeader.id, enumerator))
     iteratee.map(Right(_))
     }
-  )*/
+  )
 
   def upload = Action(fastBodyAccumulator) (rq => {
     val str = new String(rq.body.map(_.toChar))
@@ -70,20 +70,19 @@ object Application extends Controller {
     Concurrent
     Ok(rq.body).as("application/octet-stream")
   })
+  */
 
-  def upload3 = Action(containerMultipartBodyParser) (rq => {
-    val reqId = rq.id
+  def upload(ident: String) = Action(containerMultipartBodyParser(ident)) (rq => {
     println("upload action!")
-    Ok(views.html.index(s"finished uploading file with request id = ${reqId}"))
+    Ok("TODO: some json here")
   })
 
-
-  def download(id: Long) = Action(rq => {
-    StateHelper.requestIdEnumeratorsMap.get(id) match {
+  def download(ident: String) = Action(rq => {
+    StateHelper.identEnumeratorsMap.get(ident) match {
       case None => NotFound("404 - not found")
       case Some(enumerator)  => {
         val reportingEnumerator = enumerator.onDoneEnumerating({println("done enumerating the download")})
-        StateHelper.requestIdEnumeratorsMap -= id
+        StateHelper.identEnumeratorsMap -= ident
         Ok.chunked(reportingEnumerator).as("application/octet-stream")
       }
     }

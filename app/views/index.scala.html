@@ -1,12 +1,16 @@
-@(message: String)
+@(ident: String)
 
 @main("Sharemore") {
-
+  <div>
+    The transfer ident is<br />
+    @ident
+    <a href="/download/@ident">future download link</a>
+  </div>
   <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
   <script>
     $(document).ready(function () {
       $('.fileUpload').liteUploader({
-        script: '/upload'
+        script: '/upload/@ident'
       })
       .on('lu:success', function (e, response) {
         alert('Uploaded!');
@@ -15,15 +19,8 @@
         console.log("progress " + procent.toString())
       });
     });
-    //$('.fileUpload').data().liteUploader.abort()
     //$('.fileUpload').data().liteUploader.cancelUpload()
   </script>
 
-  <!--
-  @helper.form(action = routes.Application.upload3, 'enctype -> "multipart/form-data", 'method -> "POST") {
-    <input type="file" name="file" />
-    <p><input type="submit" /></p>
-  }
-  -->
 
 }
