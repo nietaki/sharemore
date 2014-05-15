@@ -11,4 +11,8 @@ object BusinessHelper {
   val identLength = 10
 
   def newIdent(): String = Random.alphanumeric.take(identLength).mkString
+
+  def escape(filename: String): String = {
+    filename.replaceAll("\\s", "_")
+  }
 }

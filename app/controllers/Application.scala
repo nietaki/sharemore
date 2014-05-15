@@ -16,6 +16,7 @@ object Application extends Controller {
     Ok(views.html.index(ident))
   }
 
+  /*
   val fastBodyAccumulator = BodyParser(
     request => Iteratee.foldM[Array[Byte],Array[Byte]](Array())(
       (state, content) =>
@@ -25,11 +26,14 @@ object Application extends Controller {
         })
       ).map(Right(_))
   )
+  */
 
   def filePartHandler(ident: String) = Multipart.handleFilePart({
     case Multipart.FileInfo(partName, filename, contentType) => {
       val (iteratee, enumerator) = Concurrent.joined[Array[Byte]]
       StateHelper.identEnumeratorsMap += ((ident, enumerator))
+      StateHelper.identFilenameMap += ((ident, filename))
+      println(s"filename=$filename")
       iteratee
     }
   })
@@ -50,40 +54,30 @@ object Application extends Controller {
     retDone
   })
 
-  /*
-  val enumeratorSaverBodyParser: BodyParser[Unit] = BodyParser("enumeratorBodyParser")( requestHeader => {
-    val (iteratee, enumerator) = Concurrent.joined[Array[Byte]]
-    print(s"the request id is ${requestHeader.id}\n")
-    StateHelper.requestIdEnumeratorsMap += ((requestHeader.id, enumerator))
-    iteratee.map(Right(_))
-    }
-  )
-
-  def upload = Action(fastBodyAccumulator) (rq => {
-    val str = new String(rq.body.map(_.toChar))
-    val (e, chan) = Concurrent.broadcast[String]
-    print("before pushing 1\n")
-    chan.push("foo")
-    print("before pushing 2\n")
-    chan.push("bar")
-    print("after pushing 2\n")
-    Concurrent
-    Ok(rq.body).as("application/octet-stream")
-  })
-  */
-
   def upload(ident: String) = Action(containerMultipartBodyParser(ident)) (rq => {
     println("upload action!")
     Ok("TODO: some json here")
   })
 
-  def download(ident: String) = Action(rq => {
+  def download(ident: String) = Action {rq =>
+    //val filename="tmp.tmp"
+    val filename = BusinessHelper.escape(StateHelper.identFilenameMap(ident))
+    Ok(views.html.download(ident, filename))
+  }
+
+  def file(ident: String, filename: String) = Action(rq => {
     StateHelper.identEnumeratorsMap.get(ident) match {
       case None => NotFound("404 - not found")
       case Some(enumerator)  => {
-        val reportingEnumerator = enumerator.onDoneEnumerating({println("done enumerating the download")})
-        StateHelper.identEnumeratorsMap -= ident
-        Ok.chunked(reportingEnumerator).as("application/octet-stream")
+        val storedFilename = BusinessHelper.escape(StateHelper.identFilenameMap(ident))
+        if(filename != storedFilename) {
+          NotFound("404 - filename incorrect")
+        } else {
+          val reportingEnumerator = enumerator.onDoneEnumerating({println("done enumerating the download")})
+          StateHelper.identEnumeratorsMap -= ident
+          StateHelper.identFilenameMap -= ident
+          Ok.chunked(reportingEnumerator).as("application/octet-stream")
+        }
       }
     }
   })
