@@ -11,7 +11,7 @@ import BusinessHelper._
  * @param myIdent the ident of the file being uploaded
  */
 class TransferTracker(val myIdent: String, val observable: ActorRef, val out: ActorRef) extends Actor {
-
+  println("transferTracker created")
   override def preStart(): Unit = {
     observable ! Subscribe(self, myIdent)
   }

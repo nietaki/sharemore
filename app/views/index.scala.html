@@ -1,4 +1,4 @@
-@(ident: String)
+@(ident: String, websocketUrl: String)
 
 @main("Sharemore") {
   <div>
@@ -19,6 +19,8 @@
         console.log("progress " + procent.toString())
       });
     });
+    ws = new WebSocket('@websocketUrl')
+    ws.onopen = function(evt){console.log('websocket open'); ws.send(JSON.stringify({'a':'b'}))}
     //$('.fileUpload').data().liteUploader.cancelUpload()
   </script>
 
