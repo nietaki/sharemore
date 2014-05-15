@@ -59,7 +59,7 @@ object Application extends Controller {
     val retDone = ret.map[Right[Nothing, Unit.type]](x => {
       println("upload parser iteratee is SO done")
       //val ref = Akka.system.actorSelection(BusinessHelper.transferSupervisorPath)
-      BusinessHelper.transferSupervisorRef ! BusinessHelper.DownloadDone(ident)
+      //BusinessHelper.transferSupervisorRef ! BusinessHelper.DownloadDone(ident)
       x
     })
     retDone
@@ -87,7 +87,10 @@ object Application extends Controller {
         if(filename != storedFilename) {
           NotFound("404 - filename incorrect")
         } else {
-          val reportingEnumerator = enumerator.onDoneEnumerating({println("done enumerating the download")})
+          val reportingEnumerator = enumerator.onDoneEnumerating({
+            println("done enumerating the download")
+            BusinessHelper.transferSupervisorRef ! BusinessHelper.DownloadDone(ident)
+          })
           StateHelper.identEnumeratorsMap -= ident
           StateHelper.identFilenameMap -= ident
           Ok.chunked(reportingEnumerator).as("application/octet-stream")

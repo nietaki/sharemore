@@ -3,6 +3,7 @@ package helpers
 import akka.actor.{Props, ActorRef, Actor}
 import scala.collection.mutable.{HashMap, MultiMap, Set}
 import BusinessHelper._
+import play.api.libs.json._
 
 
 /**
@@ -16,13 +17,21 @@ class TransferTracker(val myIdent: String, val observable: ActorRef, val out: Ac
     observable ! Subscribe(self, myIdent)
   }
 
+  override def postStop() = {
+    observable ! Unsubscribe(self, myIdent)
+  }
+
+
   def receive = {
     case DownloadDone(ident) => {
       assert(ident == myIdent)
       //forwarding the info to all subscribers
       println(s"TransferTrackersees that download done with ident: $ident")
-      observable ! Unsubscribe(self, myIdent)
+      out ! new JsObject(List(("command", new JsString("abort"))))
       context.stop(self)
+    }
+    case js: JsValue => {
+      println(s"TransferTracker received JSON $js")
     }
     case sth => println(s"TransferTracker received $sth")
   }

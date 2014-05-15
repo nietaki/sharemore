@@ -13,13 +13,22 @@
         script: '/upload/@ident'
       })
       .on('lu:success', function (e, response) {
+        console.log('Uploaded!');
         alert('Uploaded!');
       } )
+      .on('lu:cancelled', function(e){alert('cancelled')})
+      .on('lu:fail', function(e,jqxhr){/*alert('failed')*/})
       .on('lu:progress', function(e, procent){
         console.log("progress " + procent.toString())
       });
     });
     ws = new WebSocket('@websocketUrl')
+    ws.onmessage = function(msg){
+      console.log(msg)
+      //TODO actually parse the message
+      //TODO not cancel if successed
+      $('.fileUpload').data().liteUploader.cancelUpload()
+    }
     ws.onopen = function(evt){console.log('websocket open'); ws.send(JSON.stringify({'a':'b'}))}
     //$('.fileUpload').data().liteUploader.cancelUpload()
   </script>
