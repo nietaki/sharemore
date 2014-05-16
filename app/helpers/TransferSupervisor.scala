@@ -22,10 +22,9 @@ class TransferSupervisor extends Actor {
     case Unsubscribe(actorRef, ident) => {
       listeners.removeBinding(ident, actorRef)
     }
-    case DownloadDone(ident) => {
+    case ttm: DirectTransferMessage => {
       //forwarding the info to all subscribers
-      println(s"download done with ident: $ident")
-      forEachListener(ident)(_ ! DownloadDone(ident))
+      forEachListener(ttm.ident)(_ ! ttm)
     }
     case sth => println(s"TransferSupervisor received $sth")
   }

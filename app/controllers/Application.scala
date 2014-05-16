@@ -87,13 +87,23 @@ object Application extends Controller {
         if(filename != storedFilename) {
           NotFound("404 - filename incorrect")
         } else {
-          val reportingEnumerator = enumerator.onDoneEnumerating({
-            println("done enumerating the download")
-            BusinessHelper.transferSupervisorRef ! BusinessHelper.DownloadDone(ident)
+          var eof = false
+          val EOF: Enumeratee[Array[Byte], Array[Byte]] = Enumeratee.onEOF(() => {
+            println("eof")
+            eof = true
+            BusinessHelper.transferSupervisorRef ! BusinessHelper.UploadFinished(ident)
+          }) //when file was uploaded as whole
+          val itDone: Enumeratee[Array[Byte], Array[Byte]] = Enumeratee.onIterateeDone(() => {
+            //iteratee is done when the download is cancelled or finished
+            println("iteratee done")
+            if(!eof)
+              BusinessHelper.transferSupervisorRef ! BusinessHelper.DownloadCancelled(ident)
           })
+
+          val combined: Enumeratee[Array[Byte], Array[Byte]] =  EOF ><> itDone
           StateHelper.identEnumeratorsMap -= ident
           StateHelper.identFilenameMap -= ident
-          Ok.chunked(reportingEnumerator).as("application/octet-stream")
+          Ok.chunked(enumerator through combined).as("application/octet-stream")
         }
       }
     }

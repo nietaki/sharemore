@@ -1,9 +1,10 @@
 package helpers
 
-import akka.actor.{Props, ActorRef, Actor}
+import akka.actor.{Cancellable, Props, ActorRef, Actor}
 import scala.collection.mutable.{HashMap, MultiMap, Set}
 import BusinessHelper._
 import play.api.libs.json._
+import scala.concurrent.duration.FiniteDuration
 
 
 /**
@@ -21,13 +22,21 @@ class TransferTracker(val myIdent: String, val observable: ActorRef, val out: Ac
     observable ! Unsubscribe(self, myIdent)
   }
 
-
+  var uploadFinished = false
   def receive = {
-    case DownloadDone(ident) => {
+    case DownloadCancelled(ident) => {
       assert(ident == myIdent)
-      //forwarding the info to all subscribers
-      println(s"TransferTrackersees that download done with ident: $ident")
-      out ! new JsObject(List(("command", new JsString("abort"))))
+      if(!uploadFinished) {
+        out ! new JsObject(List(("command", new JsString("abort"))))
+      } else {
+        println("upload finished, not aborting")
+      }
+      context.stop(self)
+    }
+    case UploadFinished(ident) => {
+      assert(ident == myIdent)
+      uploadFinished = true //if this message arrives first
+      println(s"TransferTracker sees UploadFinished done with ident: $ident")
       context.stop(self)
     }
     case js: JsValue => {

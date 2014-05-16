@@ -25,7 +25,11 @@ object BusinessHelper {
   /*
    * messages sent to the supervisor
    */
-  case class DownloadDone(ident: String)
+  abstract class DirectTransferMessage {
+    val ident: String
+  }
+  case class DownloadCancelled(ident: String) extends DirectTransferMessage
+  case class UploadFinished(ident: String) extends DirectTransferMessage
 
   /*
    * messages sent by the transfer trackers to the supervisor
