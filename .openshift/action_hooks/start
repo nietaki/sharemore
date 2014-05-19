@@ -2,4 +2,7 @@
 # The logic to start up your application should be put in this
 # script. The application will work only if it binds to
 # $OPENSHIFT_DIY_IP:8080
-nohup $OPENSHIFT_REPO_DIR/diy/testrubyserver.rb $OPENSHIFT_DIY_IP $OPENSHIFT_REPO_DIR/diy |& /usr/bin/logshifter -tag diy &
+# nohup $OPENSHIFT_REPO_DIR/diy/testrubyserver.rb $OPENSHIFT_DIY_IP $OPENSHIFT_REPO_DIR/diy |& /usr/bin/logshifter -tag diy &
+
+nohup $OPENSHIFT_REPO_DIR/target/universal/stage/bin/sharemore_2_3 -Dhttp.address=$OPENSHIFT_DIY_IP -Dhttp.port=8080 -Dpidfile.path=$OPENSHIFT_REPO_DIR/misc/pid.pid &
+
