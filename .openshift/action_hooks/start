@@ -6,5 +6,6 @@
 
 #  ./activator -Dsbt.boot.directory=/tmp
 # nohup $OPENSHIFT_REPO_DIR/target/universal/stage/bin/sharemore_2_3 -Dhttp.address=$OPENSHIFT_DIY_IP -Dhttp.port=8080 -Dpidfile.path=$OPENSHIFT_REPO_DIR/misc/pid.pid &
-nohup $OPENSHIFT_REPO_DIR/target/universal/stage/bin/sharemore_2_3 -J-Xms128M -J-Xmx500M -Dhttp.address=$OPENSHIFT_DIY_IP -Dhttp.port=8080 -Dpidfile.path=$OPENSHIFT_REPO_DIR/misc/pid.pid &
+# nohup $OPENSHIFT_REPO_DIR/target/universal/stage/bin/sharemore_2_3 -J-Xms128M -J-Xmx500M -Dhttp.address=$OPENSHIFT_DIY_IP -Dhttp.port=8080 -Dpidfile.path=$OPENSHIFT_REPO_DIR/misc/pid.pid &
+nohup $OPENSHIFT_REPO_DIR/dist/bin/sharemore_2_3 -mem 450 -Dhttp.address=$OPENSHIFT_DIY_IP -Dhttp.port=8080 -Dpidfile.path=$OPENSHIFT_REPO_DIR/misc/pid.pid &
 

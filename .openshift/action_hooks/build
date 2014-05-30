@@ -1,4 +1,7 @@
 #!/bin/bash
-cd $OPENSHIFT_REPO_DIR
-$OPENSHIFT_REPO_DIR/activator -mem 500 -Duser.home=$OPENSHIFT_REPO_DIR/fakehome clean stage
+
+#cd $OPENSHIFT_REPO_DIR
+#$OPENSHIFT_REPO_DIR/activator -mem 500 -Duser.home=$OPENSHIFT_REPO_DIR/fakehome clean stage
+
+tar -xaf $OPENSHIFT_REPO_DIR/dist/*.tgz --strip-components=1 -C $OPENSHIFT_REPO_DIR/dist
 
