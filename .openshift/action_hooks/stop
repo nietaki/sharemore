@@ -10,4 +10,5 @@ source $OPENSHIFT_CARTRIDGE_SDK_BASH
 # fi
 
 kill $(cat $OPENSHIFT_REPO_DIR/misc/pid.pid)
+rm $OPENSHIFT_REPO_DIR/misc/pid.pid
 exit 0

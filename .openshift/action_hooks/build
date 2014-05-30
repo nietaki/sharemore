@@ -1,4 +1,4 @@
 #!/bin/bash
 
-$OPENSHIFT_REPO_DIR/activator clean stage
+$OPENSHIFT_REPO_DIR/activator -mem 500 -Duser.home=$OPENSHIFT_REPO_DIR/fakehome clean stage
 
