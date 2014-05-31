@@ -1,12 +1,14 @@
 @(ident: String, websocketUrl: String)
 
 @main("Sharemore") {
-  <div>
+  <div class="main_container">
     The transfer ident is<br />
     @ident
     <a href="/download/@ident" target="_blank">future download link</a>
+    <div id="upload_box">
+      <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
+    </div>
   </div>
-  <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
   <script>
     $(document).ready(function () {
       $('.fileUpload').liteUploader({
