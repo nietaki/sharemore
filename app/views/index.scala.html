@@ -3,9 +3,11 @@
 @main("Sharemore") {
   <div class="main_container">
     The transfer ident is<br />
-    @ident
+    @ident<br />
+    TODO: add link to the icon provider
     <a href="/download/@ident" target="_blank">future download link</a>
     <div id="upload_box">
+      <div id="upload_instructions">click here to upload or drag the file here</div>
       <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
     </div>
   </div>
