@@ -1,14 +1,34 @@
 @(ident: String, websocketUrl: String)
 
 @main("Sharemore") {
-  <div class="main_container">
-    The transfer ident is<br />
-    @ident<br />
-    TODO: add link to the icon provider
-    <a href="/download/@ident" target="_blank">future download link</a>
-    <div id="upload_box">
-      <div id="upload_instructions">click here to upload or drag the file here</div>
-      <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
+  <div class="container">
+    <div class="row">
+      <div class="page-header">
+        <h1>ShareMore <small>(a blatant copy of <a href="http://shrlss.pyetras.com/">shrlss</a>)</small></h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-9">
+        <p>Here is where you select a file to be sent to another person. When you select the file, you will be given a
+        link to pass to the recipient
+        </p>
+        <p>
+          The transfer ident is @ident <br />
+          TODO: add link to the icon provider
+        </p>
+        <div id="upload_box">
+          <div id="upload_instructions">click here to upload or drag the file here</div>
+          <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
+        </div>
+        <p>
+          <a href="/download/@ident" target="_blank">future download link</a>
+        </p>
+
+      </div>
+      <div class="col-md-3">sidebar</div>
+    </div>
+    <div class="row">
+      footer.
     </div>
   </div>
   <script>
