@@ -1,8 +1,14 @@
 @(ident: String, filename: String)
 
-@main("download") {
-  <div>
-    @ident
-    <a href="/file/@ident/@filename">feel free to start downloading</a>
-  </div>
+@main("File Download") {
+  @layout {
+    <div>
+      @ident
+      <a href="/file/@ident/@filename">feel free to start downloading</a>
+    </div>
+  }{
+
+  }{
+
+  }
 }
