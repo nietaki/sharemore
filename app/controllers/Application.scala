@@ -3,7 +3,7 @@ package controllers
 import helpers._
 import play.api._
 import play.api.Play.current
-import play.api.libs.json.JsValue
+import play.api.libs.json._
 
 //damn implicit app
 import play.api.mvc._
@@ -23,6 +23,12 @@ object Application extends Controller {
     BusinessHelper.transferSupervisorRef ! "test"
     val websocketUrl = routes.Application.status(ident).webSocketURL()(rh)
     Ok(views.html.index(ident, websocketUrl))
+  }
+
+  def getIdentAndWebsocketUrl = Action { rh =>
+    val ident = BusinessHelper.newIdent()
+    val websocketURL = routes.Application.status(ident).webSocketURL()(rh)
+    Ok(Json.obj("ident" -> ident, "websocketURL" -> websocketURL))
   }
 
   /*

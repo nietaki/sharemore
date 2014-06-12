@@ -13,6 +13,8 @@ GET         /file/:ident/:filename      controllers.Application.file(ident: Stri
 
 GET         /status/:ident       controllers.Application.status(ident: String)
 
+GET         /getIdent           controllers.Application.getIdentAndWebsocketUrl
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 GET     /webjars/*file              controllers.WebJarAssets.at(file)

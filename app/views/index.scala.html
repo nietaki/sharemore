@@ -10,11 +10,11 @@
           The transfer ident is @ident <br />
           TODO: add link to the icon provider
         </p>
-        <div id="upload_box" ng-hide="uploader.uploadStarted">
+        <div id="upload_box" ng-hide="uploadStarted">
           <div id="upload_instructions">click here to upload or drag the file here</div>
           <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
         </div>
-        <div ng-show="uploader.uploadStarted">
+        <div ng-show="uploadStarted">
           <a href="/download/@ident" target="_blank">future download link</a>
         </div>
     </div>
@@ -24,29 +24,7 @@
     lorem ipsum dolor sid amet dupa dupa dupa
   }{
   <script>
-    $(document).ready(function () {
-      $('.fileUpload').liteUploader({
-        script: '/upload/@ident'
-      })
-      .on('lu:success', function (e, response) {
-        console.log('Uploaded!');
-        alert('Uploaded!');
-      } )
-      .on('lu:cancelled', function(e){alert('cancelled')})
-      .on('lu:fail', function(e,jqxhr){/*alert('failed')*/})
-      .on('lu:progress', function(e, procent){
-        console.log("progress " + procent.toString())
-      });
-    });
-    ws = new WebSocket('@websocketUrl')
-    ws.onmessage = function(msg){
-      console.log(msg)
-      //TODO actually parse the message
-      //TODO not cancel if successed
-      $('.fileUpload').data().liteUploader.cancelUpload()
-    }
-    ws.onopen = function(evt){console.log('websocket open'); ws.send(JSON.stringify({'a':'b'}))}
-    //$('.fileUpload').data().liteUploader.cancelUpload()
+
   </script>
   }
 
