@@ -2,6 +2,7 @@
 
 @main("Sharemore") {
   @layout{
+    <div ng-controller="UploadController as uploader">
         <p>Here is where you select a file to be sent to another person. When you select the file, you will be given a
         link to pass to the recipient
         </p>
@@ -9,13 +10,14 @@
           The transfer ident is @ident <br />
           TODO: add link to the icon provider
         </p>
-        <div id="upload_box">
+        <div id="upload_box" ng-hide="uploader.uploadStarted">
           <div id="upload_instructions">click here to upload or drag the file here</div>
           <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
         </div>
-        <p>
+        <div ng-show="uploader.uploadStarted">
           <a href="/download/@ident" target="_blank">future download link</a>
-        </p>
+        </div>
+    </div>
   }{
   <!-- right column -->
     lorem ipsum dolor sid amet dupa dupa dupa
