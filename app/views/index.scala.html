@@ -1,4 +1,4 @@
-@(ident: String, websocketUrl: String)
+@()
 
 @main("Sharemore") {
   @layout{
@@ -7,7 +7,7 @@
         link to pass to the recipient
         </p>
         <p>
-          The transfer ident is @ident <br />
+          The transfer ident is {{ident}} <br />
           TODO: add link to the icon provider
         </p>
         <div id="upload_box" ng-hide="uploadStarted">
@@ -15,7 +15,7 @@
           <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
         </div>
         <div ng-show="uploadStarted">
-          <a href="/download/@ident" target="_blank">future download link</a>
+          <a href="/download/{{ident}}" target="_blank">future download link</a>
         </div>
     </div>
   }{

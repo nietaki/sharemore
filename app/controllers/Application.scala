@@ -16,13 +16,11 @@ import play.api.mvc.BodyParsers.parse.Multipart
 object Application extends Controller {
 
   def index = Action { rh =>
-    val ident = BusinessHelper.newIdent()
 
     //val ref = Akka.system.actorSelection(BusinessHelper.transferSupervisorPath)
     //ref ! "test"
     BusinessHelper.transferSupervisorRef ! "test"
-    val websocketUrl = routes.Application.status(ident).webSocketURL()(rh)
-    Ok(views.html.index(ident, websocketUrl))
+    Ok(views.html.index())
   }
 
   def getIdentAndWebsocketUrl = Action { rh =>

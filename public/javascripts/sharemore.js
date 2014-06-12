@@ -11,12 +11,12 @@
     console.log('uploader')
     $scope.uploadStarted = false
     $http.get('/getIdent').success(function(data,status){
-      var ident = data['ident']
+      $scope.ident = data['ident']
       var websocketURL = data['websocketURL']
 
       $(document).ready(function () {
         $('.fileUpload').liteUploader({
-          script: '/upload/ident'
+          script: '/upload/' + $scope.ident
         })
             .on('lu:success', function (e, response) {
               console.log('Uploaded!');
