@@ -6,16 +6,32 @@
         <p>Here is where you select a file to be sent to another person. When you select the file, you will be given a
         link to pass to the recipient
         </p>
+        <!--
         <p>
           The transfer ident is {{ident}} <br />
           TODO: add link to the icon provider
-        </p>
-        <div id="upload_box" ng-hide="uploadStarted">
+        </p>-->
+        <div ng-hide="uploadStarted" ng-file-drop="onFileSelect($files)"  class="jumbotron file_dropper" ng-file-drag-over-class="file_drag_over">
+          <span class="glyphicon glyphicon-upload"></span>
+          Drag and drop them files here
+          or just click this: <input ng-file-select="onFileSelect($files)" type="file" />
+        </div>
+
+        <!--<div id="upload_box" ng-hide="uploadStarted">
           <div id="upload_instructions">click here to upload or drag the file here</div>
           <input type="file" name="fileUpload" id="fileUpload" class="fileUpload" />
-        </div>
-        <div ng-show="uploadStarted">
-          <a href="/download/{{ident}}" target="_blank">future download link</a>
+        </div>-->
+        <div></div>
+        <p></p>
+        <div ng-show="uploadStarted" class="panel panel-success">
+          <div class="panel-heading">
+            <h3 class="panel-title">Upload started!</h3>
+          </div>
+          <div class="panel-body">
+            Now click and copy the below link and send it to the recipient: <br />
+            <input type="text" onclick="this.focus( );this.select();" readonly=""readonly" ng-model="downloadURL" class="download_address_input" /> <br />
+            <a href="{{downloadURL}}" target="_blank">or clickable for debugging</a>
+          </div>
         </div>
     </div>
   }{

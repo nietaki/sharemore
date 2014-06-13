@@ -25,6 +25,18 @@ body {
     font-size: 16px;
 }
 
+html.file_drag_over div.file_dropper {
+    background-color: darkviolet;
+}
+
+div.file_drag_over {
+    background-color: violet;
+}
+
+input.download_address_input {
+    min-width: 400px;
+}
+
 #upload_instructions {
     position: absolute;
     text-align: center;

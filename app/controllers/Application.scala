@@ -26,7 +26,8 @@ object Application extends Controller {
   def getIdentAndWebsocketUrl = Action { rh =>
     val ident = BusinessHelper.newIdent()
     val websocketURL = routes.Application.status(ident).webSocketURL()(rh)
-    Ok(Json.obj("ident" -> ident, "websocketURL" -> websocketURL))
+    val downloadURL = routes.Application.download(ident).absoluteURL()(rh)
+    Ok(Json.obj("ident" -> ident, "websocketURL" -> websocketURL, "downloadURL" -> downloadURL))
   }
 
   /*
