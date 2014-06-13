@@ -3,31 +3,41 @@
 @main("Sharemore") {
   @layout{
     <div ng-controller="UploadController as uploader">
-        <p>Here is where you select a file to be sent to another person. When you select the file, you will be given a
+      <p>Here is where you select a file to be sent to another person. When you select the file, you will be given a
         link to pass to the recipient
-        </p>
+      </p>
         <!--
         <p>
           The transfer ident is {{ident}} <br />
           TODO: add link to the icon provider
         </p>-->
-        <div ng-hide="uploadStarted" ng-file-drop="onFileSelect($files)"  class="jumbotron file_dropper" ng-file-drag-over-class="file_drag_over">
-          <span class="glyphicon glyphicon-upload"></span>
-          Drag and drop them files here
-          or just click this: <input ng-file-select="onFileSelect($files)" type="file" />
-        </div>
+      <div ng-show="uploadState==PRE_UPLOAD" ng-file-drop="onFileSelect($files)"  class="jumbotron file_dropper" ng-file-drag-over-class="file_drag_over">
+        <span class="glyphicon glyphicon-upload"></span>
+        Drag and drop them files here
+        or just click this: <input ng-file-select="onFileSelect($files)" type="file" />
+      </div>
 
-        <p></p>
-        <div ng-show="uploadStarted" class="panel panel-success">
-          <div class="panel-heading">
-            <h3 class="panel-title">Upload started!</h3>
-          </div>
-          <div class="panel-body">
-            Now click and copy the below link and send it to the recipient: <br />
-            <input type="text" onclick="this.focus( );this.select();" readonly=""readonly" ng-model="downloadURL" class="download_address_input" /> <br />
-            <a href="{{downloadURL}}" target="_blank">or clickable for debugging</a>
-          </div>
+      <p></p>
+      <div ng-show="uploadState==UPLOAD_STARTED" class="panel panel-success">
+        <div class="panel-heading">
+          <h3 class="panel-title">Upload started!</h3>
         </div>
+        <div class="panel-body">
+          Now click and copy the below link and send it to the recipient: <br />
+          <input type="text" onclick="this.focus( );this.select();" readonly="readonly" ng-model="downloadURL" class="download_address_input" /> <br />
+          <a href="{{downloadURL}}" target="_blank">or clickable for debugging</a>
+        </div>
+      </div>
+      <div ng-show="uploadState==UPLOAD_STARTED">
+      <span>Upload progress:</span>
+      <div class="progress progress-striped">
+        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="1000" ng-style="progressStyle" style="width: 0%;">
+          {{ alreadyLoaded | bytes }}/{{ fileSize | bytes }}
+        </div>
+      </div>
+      </div>
+      <div ng-show="uploadState==UPLOAD_COMPLETE">upload complete!</div>
+      <div ng-show="uploadState==UPLOAD_FAILED">upload failed:(</div>
     </div>
   }{
   <!-- right column -->

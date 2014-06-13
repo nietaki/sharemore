@@ -5,30 +5,60 @@
 
   console.log('sharemore.js')
   var app = angular.module('sharemore', ['angularFileUpload'])
-
+  app.filter('bytes', function() {
+    return function(bytes, precision) {
+      if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '-';
+      if (typeof precision === 'undefined') precision = 1;
+      var units = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'],
+          number = Math.floor(Math.log(bytes) / Math.log(1024));
+      return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
+    }
+  });
   app.controller('BodyDropController', function($scope, $upload) {
 
   });
   app.controller('UploadController', function($scope, $http, $upload){
-    console.log('uploader')
-    $scope.uploadStarted = false
-
+    console.log('uploader');
+    $scope.PRE_UPLOAD = 0;
+    $scope.UPLOAD_STARTED = 1;
+    $scope.UPLOAD_COMPLETE = 2;
+    $scope.UPLOAD_FAILED = 3;
+    $scope.uploadState = 0;
+    $scope.upload
     $http.get('/getIdent').success(function(data,status){
       $scope.ident = data['ident'];
       var websocketURL = data['websocketURL'];
       $scope.downloadURL = data['downloadURL'];
 
+      $scope.alreadyLoaded = 0;
+      $scope.fileSize = 1024;
+      $scope.progressStyle = {'width' : '0%'};
+
+      updateProgress = function(loaded, fileSize) {
+        $scope.alreadyLoaded = loaded;
+        $scope.fileSize = fileSize;
+        var procentage = (loaded/fileSize) * 100
+        if (procentage > 100)
+          procentage = 100
+        $scope.progressStyle = {'width': procentage.toString() + '%'};
+      };
+
       $scope.onFileSelect = function($files) {
-        $scope.uploadStarted = true;
-        var file = $files[0] //we want just one
+        $scope.uploadState = $scope.UPLOAD_STARTED
+        var file = $files[0];//we want just one
         $scope.upload = $upload.upload({
           url: '/upload/' + $scope.ident,
           method: 'POST',
           file: file
         }).progress(function(evt) {
-          console.log('progress: ' + evt.loaded)
+          console.log(evt)
+          updateProgress(evt.loaded, evt.total)
+        }).success(function(data, status, headers, config) {
+          $scope.uploadState = $scope.UPLOAD_COMPLETE;
+        }).error(function(data, status, headers, config) {
+          $scope.uploadState = $scope.UPLOAD_FAILED;
         })
-      }
+      };
       /*
       // old - liteUploader
       $(document).ready(function () {
